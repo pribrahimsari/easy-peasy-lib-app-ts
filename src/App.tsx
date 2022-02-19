@@ -1,31 +1,45 @@
 import React, {useState} from 'react';
 import {useStoreActions, useStoreState} from "./store/hooks";
 
-
 function App() {
-  const { name, course } = useStoreState((store) => store);
-  const { setName, updateDataThunk } = useStoreActions(store =>store);
+    const {books} = useStoreState(store => store.booksModel);
+    const {hasBook, book} = useStoreState(store => store.userModel);
+    const {borrowBookThunk, asyncThunk} = useStoreActions(actions => actions.userModel);
 
-  const [inputName, setInputName] = useState("");
-  const [inputCourse, setInputCourse] = useState("");
+    const [bookId, setBookId] = useState(0);
 
-  const handleSubmitBtn = () => {
-    updateDataThunk({
-      name: inputName,
-      course: inputCourse,
-    });
-  }
+    const handleOnBorrowBook = () => {
+        //borrowBookThunk(bookId);
+        asyncThunk(bookId);
+    }
 
-  return <div className="App">
-    <h1>Hello {name}</h1>
-    <h2>This course {course}</h2>
-    <h4>{inputName}</h4>
-    <h4>{inputCourse}</h4>
+    return (
+        <div className="App">
+            <h1>Lib App</h1>
+            <h4>My Books</h4>
+            {books.map(book=>(
+                <p key={book.id}>{book.title}</p>
+            ))}
 
-    <input type="text" placeholder={name} value={inputName} onChange={(e)=>setInputName(e.target.value)} /> <br />
-    <input type="text" placeholder={course} value={inputCourse} onChange={(e)=>setInputCourse(e.target.value)} /> <br />
-    <button onClick={handleSubmitBtn}>Submit</button>
-  </div>;
+            <h4>Your Borrowed Ones</h4>
+            {hasBook && (
+                <div>Borrowed Book: {book.title}</div>
+            )}
+            {!hasBook && <div>No borrowed books</div>}
+
+            <div>
+                <input
+                    type="number"
+                    value={bookId}
+                    onChange={(e)=>setBookId(parseInt(e.target.value))}
+                    placeholder="Choose id of book to borrow"
+                />
+                <button onClick={()=>handleOnBorrowBook()}>Submit</button>
+            </div>
+
+
+        </div>
+    );
 }
 
 export default App;
